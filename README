@@ -1,0 +1,10 @@
+To start the mongo db:
+
+1.start MongoService
+
+2.C:\Program Files\MongoDB\Server\4.0\bin>mongod
+
+
+To start node server:
+
+node app.js
