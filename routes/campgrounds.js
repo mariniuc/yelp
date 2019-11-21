@@ -1,14 +1,17 @@
-var express = require("express");
-var router = express.Router();
-var Campground = require("../models/campground");
-var middleware = require("../middleware");
+const express = require("express");
+const router = express.Router();
+const Campground = require("../models/campground");
+const middleware = require("../middleware");
+require('dotenv').config();
+const mbxClient = require('@mapbox/mapbox-sdk/services/geocoding');
+const geocodingClient = mbxClient({accessToken: process.env.MAPBOX_TOKEN});
 
-router.get("/", middleware.isLoggedIn, function (req, res) {
+router.get("/", function (req, res) {
     Campground.find({}, function (err, campgrounds) {
         if (err) {
             console.log(err);
         } else {
-            res.render("campgrounds/index", {campgrounds: campgrounds});
+            res.render("campgrounds/index", {campgrounds: campgrounds, page: 'campgrounds'});
         }
     })
 });
@@ -20,23 +23,36 @@ router.get("/new", middleware.isLoggedIn, function (req, res) {
 //CREATE
 router.get("/:id", function (req, res) {
     Campground.findById(req.params.id).populate("comments").exec(function (err, foundCampground) {
-        if (err) {
+        if (err || !foundCampground) {
+            req.flash("error", "Campground not found");
             console.log(err);
+            res.redirect("back");
         } else {
             res.render("campgrounds/show", {campground: foundCampground});
         }
     });
 });
 
-router.post("/", middleware.isLoggedIn, function (req, res) {
-    var name = req.body.name;
-    var image = req.body.image;
-    var description = req.body.description;
-    var author = {
+router.post("/", middleware.isLoggedIn, async function (req, res) {
+    const name = req.body.name;
+    const image = req.body.image;
+    const description = req.body.description;
+    const price = req.body.price;
+    const author = {
         id: req.user._id,
         username: req.user.username
     };
-    var newCampground = {name: name, image: image, description: description, author: author};
+    const location = req.body.location;
+    let coordinates = await getCoordinates(location);
+    const newCampground = {
+        name: name,
+        image: image,
+        description: description,
+        price: price,
+        author: author,
+        location: location,
+        coordinates: coordinates
+    };
     Campground.create(newCampground, function (err, newlyCreated) {
         if (err) {
             console.log(err);
@@ -54,7 +70,9 @@ router.get("/:id/edit", middleware.checkCampOwnership, function (req, res) {
     })
 });
 
-router.put("/:id/", middleware.checkCampOwnership, function (req, res) {
+router.put("/:id/", middleware.checkCampOwnership, async function (req, res) {
+    let coordinates = await getCoordinates(req.body.campground.location);
+    req.body.campground.coordinates = coordinates;
     Campground.findByIdAndUpdate(req.params.id, req.body.campground, function (err, updatedCampground) {
         if (err) {
             res.redirect("/campgrounds")
@@ -74,5 +92,19 @@ router.delete("/:id", middleware.checkCampOwnership, function (req, res) {
         }
     })
 });
+
+async function getCoordinates(location) {
+    let coords;
+    await geocodingClient.forwardGeocode({
+        query: location,
+        limit: 1
+    }).send()
+        .then(response => {
+                console.log(response.body.features[0].geometry.coordinates);
+                coords = response.body.features[0].geometry.coordinates;
+            },
+        );
+    return coords;
+}
 
 module.exports = router;

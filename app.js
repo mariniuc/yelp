@@ -3,6 +3,7 @@ var express               = require("express"),
     bodyParser            = require("body-parser"),
     port                  = 3000,
     mongoose              = require("mongoose"),
+    flash                 = require("connect-flash");
     Campground            = require("./models/campground"),
     Comment               = require("./models/comment"),
     User                  = require("./models/user"),
@@ -15,12 +16,14 @@ var express               = require("express"),
 var commentRoute          = require("./routes/comments"),
     campgroundsRoute      = require("./routes/campgrounds"),
     authRoute             = require("./routes/auth");
+app.locals.moment         = require('moment');
 
 mongoose.connect("mongodb://localhost/yelp_camp", {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
+app.use(flash());
 
 //PASSPORT CONFIG
 app.use(require("express-session")({
@@ -38,6 +41,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function (req, res, next) {
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next()
 });
 

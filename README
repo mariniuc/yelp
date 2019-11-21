@@ -8,3 +8,6 @@ To start the mongo db:
 To start node server:
 
 node app.js
+
+
+Mapbox tutorial doc: https://docs.mapbox.com/help/tutorials/custom-markers-gl-js/
