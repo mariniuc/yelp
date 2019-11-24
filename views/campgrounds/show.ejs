@@ -1,79 +1,80 @@
 <% include ../partials/header.ejs %>
 
-    <div class="row">
-        <div class="col-md-3">
-            <p class="lead">YelpCamp</p>
-            <div class="list-group">
-                <li class="list-group-item active">Info 1</li>
-                <li class="list-group-item">Info 2</li>
-                <li class="list-group-item">Info 3</li>
-            </div>
-            <div id='map'></div>
+<div class="row">
+    <div class="col-md-3">
+        <p class="lead">YelpCamp</p>
+        <div class="list-group">
+            <li class="list-group-item active">Info 1</li>
+            <li class="list-group-item">Info 2</li>
+            <li class="list-group-item">Info 3</li>
         </div>
-        <div class="col-md-9">
-            <div class="thumbnail">
-                <img class="img-responsive" src="<%= campground.image %>">
-                <div class="caption">
-                    <h4 class="pull-right">$<%= campground.price %>/night</h4>
-                    <h4><a><%= campground.name %></a></h4>
-                    <p><%= campground.description %></p>
-                    <p>
-                        <em>Submitted by: <%= campground.author.username %>, <%= moment(campground.createdAt).fromNow() %></em>
-                    </p>
-                    <% if (currentUser && campground.author.id.equals(currentUser._id)){ %>
-                        <a class="btn btn-warning" href="/campgrounds/<%= campground._id %>/edit">
-                            Edit
-                        </a>
-                        <form class="delete-form" action="/campgrounds/<%= campground._id %>?_method=DELETE"
-                              method="post">
-                            <button class="btn btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    <% } %>
-                </div>
+        <div id='map'></div>
+    </div>
+    <div class="col-md-9">
+        <div class="thumbnail">
+            <img class="img-responsive" src="<%= campground.image %>">
+            <div class="caption">
+                <h4 class="pull-right">$<%= campground.price %>/night</h4>
+                <h4><a><%= campground.name %></a></h4>
+                <p><%= campground.description %></p>
+                <p>
+                    <em>Submitted by: <%= campground.author.username %>
+                        , <%= moment(campground.createdAt).fromNow() %></em>
+                </p>
+                <% if (currentUser && campground.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
+                    <a class="btn btn-warning" href="/campgrounds/<%= campground._id %>/edit">
+                        Edit
+                    </a>
+                    <form class="delete-form" action="/campgrounds/<%= campground._id %>?_method=DELETE"
+                          method="post">
+                        <button class="btn btn-danger">
+                            Delete
+                        </button>
+                    </form>
+                <% } %>
             </div>
-            <div class="well">
-                <div class="text-right">
-                    <p>
-                        <a class="btn btn-success" href="/campgrounds/<%= campground._id %>/comments/new">Add New
-                            Comment</a>
-                    </p>
-                </div>
-                <hr>
-                <% campground.comments.forEach(function (comment) { %>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <%= comment.author.username %>
-                            <span class="pull-right">
+        </div>
+        <div class="well">
+            <div class="text-right">
+                <p>
+                    <a class="btn btn-success" href="/campgrounds/<%= campground._id %>/comments/new">Add New
+                        Comment</a>
+                </p>
+            </div>
+            <hr>
+            <% campground.comments.forEach(function (comment) { %>
+                <div class="row">
+                    <div class="col-md-12">
+                        <%= comment.author.username %>
+                        <span class="pull-right">
                                 <em><%= moment(comment.createdAt).fromNow() %></em>
                             </span>
-                            <p>
-                                <%= comment.text %>
-                            </p>
-                            <% if (currentUser && comment.author.id.equals(currentUser._id)){ %>
+                        <p>
+                            <%= comment.text %>
+                        </p>
+                        <% if (currentUser && comment.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
 
-                                <a class="btn btn-xs btn-warning"
-                                   href="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>/edit">
-                                    Edit
-                                </a>
-                                <form class="delete-form"
-                                      action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE"
-                                      method="POST">
-                                    <input type="submit" class="btn btn-xs btn-danger" value="Delete">
-                                </form>
-                            <% } %>
-                        </div>
+                            <a class="btn btn-xs btn-warning"
+                               href="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>/edit">
+                                Edit
+                            </a>
+                            <form class="delete-form"
+                                  action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE"
+                                  method="POST">
+                                <input type="submit" class="btn btn-xs btn-danger" value="Delete">
+                            </form>
+                        <% } %>
                     </div>
-                <% }) %>
-            </div>
+                </div>
+            <% }) %>
         </div>
     </div>
+</div>
 
 <script>
 
     var post = <%- JSON.stringify(campground) %>
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyaW5pdWMiLCJhIjoiY2szNjAycHJxMWd1bzNtbzI4cjZteXYydSJ9.vX8ju39jPxSCgzUFfOhq9w';
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFyaW5pdWMiLCJhIjoiY2szNjAycHJxMWd1bzNtbzI4cjZteXYydSJ9.vX8ju39jPxSCgzUFfOhq9w';
 
     var map = new mapboxgl.Map({
         container: 'map',
