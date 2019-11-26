@@ -1,9 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const Campground = require("../models/campground");
-const middleware = require("../middleware");
+const express    = require("express"),
+      router     = express.Router(),
+      Campground = require("../models/campground"),
+      middleware = require("../middleware"),
+      mbxClient  = require('@mapbox/mapbox-sdk/services/geocoding');
+
 require('dotenv').config();
-const mbxClient = require('@mapbox/mapbox-sdk/services/geocoding');
+
 const geocodingClient = mbxClient({accessToken: process.env.MAPBOX_TOKEN});
 
 router.get("/", function (req, res) {

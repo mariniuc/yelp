@@ -15,7 +15,9 @@ var express               = require("express"),
 
 var commentRoute          = require("./routes/comments"),
     campgroundsRoute      = require("./routes/campgrounds"),
-    authRoute             = require("./routes/auth");
+    authRoute             = require("./routes/auth"),
+    profileRoute          = require("./routes/profile");
+
 app.locals.moment         = require('moment');
 
 mongoose.connect("mongodb://localhost/yelp_camp", {useNewUrlParser: true});
@@ -49,6 +51,7 @@ app.use(function (req, res, next) {
 app.use("/campgrounds/:id/comments", commentRoute);
 app.use("/campgrounds", campgroundsRoute);
 app.use("/", authRoute);
+app.use("/users", profileRoute);
 // seedDB();
 
 app.listen(port, process.env.IP, function () {

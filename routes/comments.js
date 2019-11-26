@@ -1,8 +1,8 @@
-var express = require("express");
-var router = express.Router({mergeParams: true});
-var Campground = require("../models/campground");
-var Comment = require("../models/comment");
-var middleware = require("../middleware");
+const express     = require("express"),
+      Campground  = require("../models/campground"),
+      Comment     = require("../models/comment"),
+      router      = express.Router({mergeParams: true}),
+      middleware  = require("../middleware");
 
 
 //Create
