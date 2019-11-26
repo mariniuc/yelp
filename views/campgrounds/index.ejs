@@ -5,10 +5,16 @@
 <header class="jumbotron">
     <div class="container">
         <h1>Campground Page</h1>
-        <p>View our hand-picke campgrounds!</p>
+        <p>View our hand-picked campgrounds!</p>
         <p>
             <a class="btn btn-primary btn-lg" href="/campgrounds/new">New Campground</a>
         </p>
+        <form action="/campgrounds" method="get" class="form-inline">
+            <div class="form-group">
+                <input type="text" name="search" placeholder="Campground search..." class="form-control">
+                <input type="submit" value="Search" class="btn btn-default">
+            </div>
+        </form>
     </div>
 </header>
 

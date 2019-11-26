@@ -9,13 +9,24 @@ require('dotenv').config();
 const geocodingClient = mbxClient({accessToken: process.env.MAPBOX_TOKEN});
 
 router.get("/", function (req, res) {
-    Campground.find({}, function (err, campgrounds) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.render("campgrounds/index", {campgrounds: campgrounds, page: 'campgrounds'});
-        }
-    })
+    if (req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        Campground.find({name: regex}, function (err, campgrounds) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.render("campgrounds/index", {campgrounds: campgrounds, page: 'campgrounds'});
+            }
+        })
+    } else {
+        Campground.find({}, function (err, campgrounds) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.render("campgrounds/index", {campgrounds: campgrounds, page: 'campgrounds'});
+            }
+        })
+    }
 });
 
 router.get("/new", middleware.isLoggedIn, function (req, res) {
@@ -108,5 +119,9 @@ async function getCoordinates(location) {
         );
     return coords;
 }
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
 
 module.exports = router;
