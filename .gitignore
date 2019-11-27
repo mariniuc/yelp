@@ -1,3 +1,4 @@
 # Don't track content of these folders
 # dependencies
 /node_modules
+.env

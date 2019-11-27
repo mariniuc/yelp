@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 var campgroundSchema = new mongoose.Schema({
     name: String,
-    image: String,
+    image: {url: String, public_id: String},
     description: String,
     price: String,
     location: String,
@@ -19,6 +19,12 @@ var campgroundSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment"
+        }
+    ],
+    likes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         }
     ]
 });

@@ -6,6 +6,8 @@ const express  = require("express"),
       crypto = require("crypto"),
       router   = express.Router();
 
+require('dotenv').config();
+
 router.get("/", function (req, res) {
     res.render("landing")
 });
@@ -90,7 +92,7 @@ router.post('/forgot', function (req, res, next) {
                 service: 'Gmail',
                 auth: {
                     user: 'mariniuc13dan@gmail.com',
-                    pass: 'Blitzkrieg13'
+                    pass: process.env.GMAIL_PASS
                 }
             });
             const mailOptions = {
@@ -151,7 +153,7 @@ router.post('/reset/:token', function (req, res) {
                 service: 'Gmail',
                 auth: {
                     user: 'mariniuc13dan@gmail.com',
-                    pass: 'Blitzkrieg13'
+                    pass: process.env.GMAIL_PASS
                 }
             });
             const mailOptions = {
