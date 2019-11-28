@@ -1,13 +1,12 @@
-.thumbnail img{
+.card img{
     width: 100%;
 }
 
-.thumbnail{
-    padding: 0;
-}
-
-.thumbnail .caption {
-    padding: 9px;
+.form-signin {
+    width: 100%;
+    max-width: 420px;
+    padding: 15px;
+    margin: 0 auto;
 }
 
 .delete-form{
@@ -17,8 +16,9 @@
 #map {
     top: 0;
     bottom: 0;
-    width: 262px;
+    width: 255px;
     height: 300px;
+    margin-top: 1rem;
 }
 
 .marker {

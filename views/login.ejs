@@ -1,9 +1,9 @@
 <% include ./partials/header.ejs %>
 
 <div class="row">
-    <h1 style="text-align: center">Login</h1>
-    <div style="width: 30%; margin: 25px auto;">
-        <form action="/login" method="post">
+    <div class="col-md-12 text-center">
+        <h1>Login</h1>
+        <form action="/login" method="post" class="form-signin">
             <div class="form-group">
                 <input class="form-control" type="text" name="username" placeholder="username">
             </div>
@@ -13,9 +13,12 @@
             <div class="form-group">
                 <button class="btn btn-lg btn-primary btn-block">Login</button>
             </div>
+            <a href="/campgrounds" class="float-left mt-2">Go Back</a>
+
+            <a href="/forgot" class="float-right mt-2">Forgot Password</a>
         </form>
-        <a href="/campgrounds">Go Back</a>
-        <a href="/forgot" class="pull-right">Forgot Password</a>
+
+
     </div>
 </div>
 
