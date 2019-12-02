@@ -3,8 +3,9 @@
 <div class="row">
     <div class="col-md-4">
         <h1><%= user.firstName + " " + user.lastName %></h1>
-        <div class="thumbnail">
+        <div class="card">
             <img src="<%= user.avatar %>" alt="user avatar">
+            <a href="/notifications/follow/<%= user.id %>"><button class="btn btn-primary">Follow <%= user.username %></button></a>
         </div>
     </div>
     <div class="col-md-8">

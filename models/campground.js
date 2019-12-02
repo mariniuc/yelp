@@ -1,6 +1,8 @@
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
+const Comment  = require("./comment");
 
-var campgroundSchema = new mongoose.Schema({
+
+const campgroundSchema = new mongoose.Schema({
     name: String,
     image: {url: String, public_id: String},
     description: String,
@@ -29,4 +31,16 @@ var campgroundSchema = new mongoose.Schema({
     ]
 });
 
+campgroundSchema.pre('remove', async function (next) {
+    try {
+        await Comment.deleteMany({
+            "_id": {
+                $in: this.comments
+            }
+        });
+        next();
+    } catch (err) {
+        next(err)
+    }
+});
 module.exports = mongoose.model("Campground", campgroundSchema);

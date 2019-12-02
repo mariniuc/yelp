@@ -1,6 +1,7 @@
 const express = require("express"),
     router = express.Router(),
     Campground = require("../models/campground"),
+    Notification = require("../models/notification"),
     middleware = require("../middleware"),
     mbxClient = require('@mapbox/mapbox-sdk/services/geocoding');
 
@@ -60,9 +61,9 @@ router.get("/new", middleware.isLoggedIn, function (req, res) {
     res.render("campgrounds/new")
 });
 
-//CREATE
+//SHOW ONE CAMP
 router.get("/:id", function (req, res) {
-    Campground.findById(req.params.id).populate("comments").exec(function (err, foundCampground) {
+    Campground.findById(req.params.id).populate("comments notifications likes").exec(function (err, foundCampground) {
         if (err || !foundCampground) {
             req.flash("error", "Campground not found");
             console.log(err);
@@ -73,9 +74,10 @@ router.get("/:id", function (req, res) {
     });
 });
 
+//CREATE
 router.post("/", middleware.isLoggedIn, upload.single('image'), async function (req, res) {
     const name = req.body.name;
-    console.log(req.body);
+    // console.log(req.body);
 
     let image = await cloudinary.v2.uploader.upload(req.file.path, function (err, result) {
         if (err) {
@@ -129,7 +131,7 @@ router.put("/:id/", middleware.checkCampOwnership, upload.single('image'), async
             res.redirect("/campgrounds")
         } else {
             if (req.file) {
-                console.log(req.file);
+                // console.log(req.file);
                 try {
                     await cloudinary.v2.uploader.destroy(campground.image.public_id);
                     const result = await cloudinary.v2.uploader.upload(req.file.path);
@@ -156,7 +158,7 @@ router.delete("/:id", middleware.checkCampOwnership, function (req, res) {
         }
         try {
             await cloudinary.v2.uploader.destroy(campground.image.public_id);
-            campground.remove();
+            campground.deleteOne();
             req.flash('success', 'Campground deleted successfully!');
             res.redirect('/campgrounds');
         } catch (err) {
@@ -168,6 +170,38 @@ router.delete("/:id", middleware.checkCampOwnership, function (req, res) {
     })
 });
 
+// Campground Like Route
+router.post("/:id/like", middleware.isLoggedIn, function (req, res) {
+    Campground.findById(req.params.id, function (err, foundCampground) {
+        if (err) {
+            console.log(err);
+            return res.redirect("/campgrounds");
+        }
+
+        // check if req.user._id exists in foundCampground.likes
+        const foundUserLike = foundCampground.likes.some(function (like) {
+            return like.equals(req.user._id);
+        });
+
+        if (foundUserLike) {
+            // user already liked, removing like
+            foundCampground.likes.pull(req.user._id);
+        } else {
+            // adding the new user like
+            foundCampground.likes.push(req.user);
+        }
+
+        foundCampground.save(function (err) {
+            if (err) {
+                console.log(err);
+                return res.redirect("/campgrounds");
+            }
+            return res.redirect("/campgrounds/" + foundCampground._id);
+        });
+    });
+});
+
+
 //MAPBOX GET COORDINATES
 async function getCoordinates(location) {
     let coords;
@@ -176,7 +210,7 @@ async function getCoordinates(location) {
         limit: 1
     }).send()
         .then(response => {
-                console.log(response.body.features[0].geometry.coordinates);
+                // console.log(response.body.features[0].geometry.coordinates);
                 coords = response.body.features[0].geometry.coordinates;
             },
         );
