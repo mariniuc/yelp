@@ -3,6 +3,7 @@ const express = require("express"),
     Campground = require("../models/campground"),
     Notification = require("../models/notification"),
     middleware = require("../middleware"),
+    User = require("../models/user");
     mbxClient = require('@mapbox/mapbox-sdk/services/geocoding');
 
 const multer = require('multer');
@@ -63,7 +64,7 @@ router.get("/new", middleware.isLoggedIn, function (req, res) {
 
 //SHOW ONE CAMP
 router.get("/:id", function (req, res) {
-    Campground.findById(req.params.id).populate("comments notifications likes").exec(function (err, foundCampground) {
+    Campground.findById(req.params.id).populate("comments likes").exec(function (err, foundCampground) {
         if (err || !foundCampground) {
             req.flash("error", "Campground not found");
             console.log(err);
@@ -77,7 +78,6 @@ router.get("/:id", function (req, res) {
 //CREATE
 router.post("/", middleware.isLoggedIn, upload.single('image'), async function (req, res) {
     const name = req.body.name;
-    // console.log(req.body);
 
     let image = await cloudinary.v2.uploader.upload(req.file.path, function (err, result) {
         if (err) {
@@ -106,14 +106,23 @@ router.post("/", middleware.isLoggedIn, upload.single('image'), async function (
         coordinates: coordinates
     };
     console.log(newCampground);
-    Campground.create(newCampground, function (err, newlyCreated) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(newlyCreated);
-            res.redirect("/campgrounds");
+    try {
+        let campground = await Campground.create(newCampground);
+        let user = await User.findById(req.user._id).populate('followers').exec();
+        let newNotification = {
+            username: req.user.username,
+            campground_id: campground._id
+        };
+        for(const follower of user.followers) {
+            let notification = await Notification.create(newNotification);
+            follower.notifications.push(notification);
+            follower.save();
         }
-    });
+        res.redirect(`/campgrounds/${campground.id}`);
+    } catch(err) {
+        req.flash('error', err.message);
+        res.redirect('back');
+    }
 });
 
 //EDIT
@@ -131,7 +140,6 @@ router.put("/:id/", middleware.checkCampOwnership, upload.single('image'), async
             res.redirect("/campgrounds")
         } else {
             if (req.file) {
-                // console.log(req.file);
                 try {
                     await cloudinary.v2.uploader.destroy(campground.image.public_id);
                     const result = await cloudinary.v2.uploader.upload(req.file.path);

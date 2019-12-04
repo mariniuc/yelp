@@ -54,21 +54,21 @@ app.use(async function (req, res, next) {
     if(req.user) {
         try {
             let user = await User.findById(req.user._id).populate('notifications', null, { isRead: false }).exec();
-            res.locals.notifications = user.notifications.reverse();
+            res.locals.notifications = user.notifications;
         } catch(err) {
             console.log(err.message);
         }
     }
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
-    next()
+    next();
 });
 
 app.use("/campgrounds/:id/comments", commentRoute);
 app.use("/campgrounds", campgroundsRoute);
-app.use("/", authRoute);
 app.use("/users", profileRoute);
 app.use("/notifications", notificationsRoute);
+app.use("/", authRoute);
 
 // seedDB();
 

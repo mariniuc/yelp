@@ -40,12 +40,12 @@
             <% } else { %>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Notifications
-                        <span class="badge badge-light"><%= currentUser.notifications.length %></span>
+                       aria-expanded="false" id="notifications">Notifications
+                        <span class="badge badge-light"><%= notifications.length %></span>
                     </a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="/notifications">View past notifications</a>
-                        <% currentUser.notifications.forEach(function(notification) { %>
+                        <% notifications.forEach(function(notification) { %>
                             <a class="dropdown-item" href="/notifications/<%= notification.id %>">
                                 <%= notification.username %> created a new campground
                             </a>

@@ -13,6 +13,10 @@
     display: inline;
 }
 
+#notifications{
+    cursor: pointer;
+}
+
 #map {
     top: 0;
     bottom: 0;

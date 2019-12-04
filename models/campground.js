@@ -3,7 +3,10 @@ const Comment  = require("./comment");
 
 
 const campgroundSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: "Campground name cannot be blank!"
+    },
     image: {url: String, public_id: String},
     description: String,
     price: String,
